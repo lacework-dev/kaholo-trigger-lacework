@@ -13,6 +13,17 @@ function alertWebhook(req,res) {
 
 function execTrigger (trigger, body,io) {
     new Promise ((resolve,reject) => {
+        const eventType = body.event_type;
+        const eventDescription = body.event_description;
+
+        const triggerEventType = trigger.params.find(o => o.name === 'EVENT_TYPE');
+        const triggerEventID = trigger.params.find(o => o.name === 'ID');
+        if (triggerEventType.value != eventType) {
+            return reject("Not matching event type name");
+        }
+        if (!eventDescription.includes(triggerEventID.value)) {
+            return reject(`Not matching event ID name`);
+        }
         return resolve()
     }).then(() => {
         console.log(trigger.map);

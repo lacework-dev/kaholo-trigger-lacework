@@ -12,6 +12,22 @@
       "route": "post /webhook/lacework/alert",
       "viewName": "Alert from Lacework",
       "params": [
+        {
+          "name": "EVENT_TYPE",
+          "viewName": "Event type",
+          "type": "options",
+          "options": [
+            {
+              "id": "Compliance",
+              "name": "Compliance"
+            }
+          ]
+        },
+        {
+          "name":"ID",
+          "viewName":"Issue ID",
+          "type": "string"
+        }
       ]
     }
   ]
