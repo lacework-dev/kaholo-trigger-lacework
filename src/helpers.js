@@ -19,7 +19,7 @@ function findTriggers(validatationFn, startParams, req, res, method, description
 function exec(trigger, body, io, description) {
   return () => {
     console.log(trigger.map);
-    const message = `${trigger.name} - Started by Lacework trigger, event: ${description}`;
+    const message = `${trigger.name}, event: ${description}`;
     console.log(`******** Lacework: executing map ${trigger.map} ********`);
     mapExecutionService.execute(
       trigger.map,
