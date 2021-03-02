@@ -1,38 +1,44 @@
-const config = require("./config");
-const mapExecutionService = require("../../../api/services/map-execution.service");
-const Trigger = require("../../../api/models/map-trigger.model");
+const { findTriggers } = require("./helpers");
 
-function alertWebhook(req,res) {
-    let body = req.body
-    Trigger.find({ plugin: config.name }).then((triggers) => {
-        console.log(`Found ${triggers.length} triggers`);
-        res.send('OK');
-        triggers.forEach(trigger=>execTrigger(trigger,body,req.io))
-    }).catch((error) => res.send(error))
-}
+function alertWebhook(req, res) {
+    const body = req.body;
 
-function execTrigger (trigger, body,io) {
-    new Promise ((resolve,reject) => {
-        const eventType = body.event_type;
-        const eventDescription = body.event_description;
+    const eventType = body.event_type; // Get event type
+    const eventDescription = body.event_description; // Get event ID
+    const eventSeverity = body.event_severity; // Get event severity 
+    const eventTitle = body.event_title; // Get event severity
+    if (!eventType || !eventDescription || !eventSeverity){
+        throw "bad lacework alert format";
+    }
 
-        const triggerEventType = trigger.params.find(o => o.name === 'EVENT_TYPE');
-        const triggerEventID = trigger.params.find(o => o.name === 'ID');
-        if (triggerEventType.value != eventType) {
-            return reject("Not matching event type name");
-        }
-        if (!eventDescription.includes(triggerEventID.value)) {
-            return reject(`Not matching event ID name`);
-        }
-        return resolve()
-    }).then(() => {
-        console.log(trigger.map);
-        let message = trigger.name + ' started by Lacework trigger'
-        mapExecutionService.execute(trigger.map,null,io,{config: trigger.configuration},message,body);
-    }).catch(err=>{
-        console.error(err);
-    })
+    findTriggers(
+      validateTrigger,
+      { eventType, eventDescription, eventSeverity },
+      req, res, "alertWebhook",
+      `${eventTitle} - severity ${eventSeverity}` // event description for kaholo
+    );
 }
-module.exports = {
-    ALERT_WEBHOOK: alertWebhook
+  
+async function validateTrigger(trigger, { eventType, eventDescription, eventSeverity }) {
+    const triggerEventType = trigger.params.find((o) => o.name === "eventType").value || "any";
+    const triggerEventId = (trigger.params.find((o) => o.name === "id").value || "").trim();
+    const triggerEventSeverity = trigger.params.find((o) => o.name === "eventSeverity").value || "any";
+    /**
+     * if event type was provided check it matches event type in post request
+     */
+    if (triggerEventType !== "any" && eventType !== triggerEventType) {
+      throw "Not same event type";
+    }
+    /**
+     * if event ID was provided check it matches event ID in post request
+     */
+    if (triggerEventId && !eventDescription.includes(` ${triggerEventId} `)){
+        throw "Not same event ID";;
+    }
+    if (triggerEventSeverity != "any" && eventSeverity != triggerEventSeverity){
+      throw "Not same event severity";
+    }
+    return true;
 }
+  
+module.exports = { alertWebhook }
