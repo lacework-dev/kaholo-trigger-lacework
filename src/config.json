@@ -1,0 +1,93 @@
+{
+  "name": "kaholo-trigger-lacework",
+  "type": "trigger",
+  "execProgram": "node",
+  "main": "app.js",
+  "imgUrl": "lacework.png",
+  "version": "1.1.0",
+  "description": "Lacework Trigger",
+  "methods": [
+    {
+      "name": "alertWebhook",
+      "route": "post /webhook/lacework/alert",
+      "viewName": "Lacework Alert",
+      "params": [
+        {
+          "name": "eventType",
+          "viewName": "Event type",
+          "type": "options",
+          "options": [
+            {
+              "id": "any",
+              "name": "Any"
+            },
+            {
+              "id": "Compliance",
+              "name": "Compliance"
+            },
+            {
+              "id": "User",
+              "name": "User"
+            },
+            {
+              "id": "Machine",
+              "name": "Machine"
+            },
+            {
+              "id": "File",
+              "name": "File"
+            },
+            {
+              "id": "Cloud Activity",
+              "name": "Cloud Activity"
+            },
+            {
+              "id": "Cloud Activity",
+              "name": "Cloud Activity"
+            },
+            {
+              "id": "Test",
+              "name": "Test"
+            }
+          ]
+        },
+        {
+          "name":"id",
+          "viewName":"Event ID",
+          "type": "string"
+        },
+        {
+          "name":"eventSeverity",
+          "viewName":"Event Severity",
+          "type": "options",
+          "options": [
+            {
+              "id": "any",
+              "name": "Any"
+            },
+            {
+              "id": "0",
+              "name": "Info"
+            },
+            {
+              "id": "1",
+              "name": "Low"
+            },
+            {
+              "id": "2",
+              "name": "Medium"
+            },
+            {
+              "id": "3",
+              "name": "High"
+            },
+            {
+              "id": "4",
+              "name": "Critical"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
